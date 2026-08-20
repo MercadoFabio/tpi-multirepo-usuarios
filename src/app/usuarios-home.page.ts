@@ -1,16 +1,12 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 interface Usuario {
   readonly id: number;
   readonly nombre: string;
   readonly rol: string;
 }
-
-const USUARIOS: readonly Usuario[] = [
-  { id: 1, nombre: 'Ana García', rol: 'Administradora' },
-  { id: 2, nombre: 'Bruno Pérez', rol: 'Docente' },
-  { id: 3, nombre: 'Carla López', rol: 'Estudiante' },
-];
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -20,7 +16,7 @@ const USUARIOS: readonly Usuario[] = [
       <h1>Usuarios</h1>
       <p>Esta pantalla vive en su propio repositorio y contenedor Docker.</p>
       <ul>
-        @for (usuario of usuarios; track usuario.id) {
+        @for (usuario of usuarios(); track usuario.id) {
           <li><a [href]="'/usuarios/' + usuario.id"><strong>{{ usuario.nombre }}</strong><span>{{ usuario.rol }}</span></a></li>
         }
       </ul>
@@ -38,5 +34,9 @@ const USUARIOS: readonly Usuario[] = [
   `,
 })
 export class UsuariosHomePage {
-  readonly usuarios = USUARIOS;
+  private readonly http = inject(HttpClient);
+  readonly usuarios = toSignal(
+    this.http.get<readonly Usuario[]>('http://localhost/api/usuarios'),
+    { initialValue: [] },
+  );
 }
