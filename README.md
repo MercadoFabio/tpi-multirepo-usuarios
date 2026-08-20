@@ -16,3 +16,6 @@ La imagen compila la app con `base-href=/usuarios/` para que funcione detrás de
 ```bash
 docker build -t tpi-multirepo-usuarios .
 ```
+
+En producción, la app consulta usuarios mediante el BFF compartido en
+`http://localhost:8081/api/usuarios`.
